@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Pharmacologie</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 2rem; }
+    .quiz-container { max-width: 600px; margin: auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .question { font-size: 1.2rem; margin-bottom: 1rem; }
+    .answers button { display: block; margin: 0.5rem 0; width: 100%; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; background: #e0e0e0; }
+    .answers button:hover { background: #d0d0d0; }
+    .score, .timer { font-weight: bold; margin-top: 1rem; }
+    #startBtn { padding: 1rem 2rem; font-size: 1.2rem; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  </style>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4caf50">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Quiz Pharma">
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Quiz Pharmacologie</h1>
+    <div id="quiz">
+      <button id="startBtn">Commencer le quiz</button>
+    </div>
+    <a href="index.html" download="index.html" style="display:block;text-align:center;margin-top:20px;font-weight:bold;color:#4caf50;">⭳ Télécharger ce quiz</a>
+    <div class="score" id="score"></div>
+    <div class="timer" id="timer"></div>
+  </div>
+
+  <script>
+    // Le tableau questions complet est trop long ici mais doit être collé dans cette variable
+    const questions = [/* Ton tableau complet de 65 questions ici */];
+    let currentQuestion = 0, score = 0, timeLeft = 960, timerInterval;
+    const quizDiv = document.getElementById("quiz"), scoreDiv = document.getElementById("score"),
+          timerDiv = document.getElementById("timer"), startBtn = document.getElementById("startBtn");
+    startBtn.addEventListener("click", startQuiz);
+
+    function startQuiz() {
+      startBtn.style.display = "none";
+      showQuestion();
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDiv.textContent = `Temps restant : ${Math.floor(timeLeft / 60)}m ${timeLeft % 60}s`;
+        if (timeLeft <= 0) { clearInterval(timerInterval); endQuiz(); }
+      }, 1000);
+    }
+
+    function showQuestion() {
+      if (currentQuestion >= questions.length) return endQuiz();
+      const q = questions[currentQuestion];
+      quizDiv.innerHTML = `<div class="question">${q.question}</div>`;
+      const answersDiv = document.createElement("div"); answersDiv.classList.add("answers");
+      q.answers.forEach(answer => {
+        const btn = document.createElement("button");
+        btn.textContent = answer;
+        btn.onclick = () => checkAnswer(answer);
+        answersDiv.appendChild(btn);
+      });
+      quizDiv.appendChild(answersDiv);
+    }
+
+    function checkAnswer(answer) {
+      if (answer === questions[currentQuestion].correct) score++;
+      currentQuestion++;
+      showQuestion();
+    }
+
+    function endQuiz() {
+      clearInterval(timerInterval);
+      quizDiv.innerHTML = "<h2>Quiz terminé !</h2>";
+      scoreDiv.textContent = `Score : ${score}/${questions.length}`;
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker enregistré'))
+        .catch(error => console.error('Erreur SW:', error));
+    }
+  </script>
+</body>
+</html>

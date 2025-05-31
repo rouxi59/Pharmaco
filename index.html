@@ -24,14 +24,13 @@
     <div id="quiz">
       <button id="startBtn">Commencer le quiz</button>
     </div>
-    <a href="index.html" download="index.html" style="display:block;text-align:center;margin-top:20px;font-weight:bold;color:#4caf50;">⭳ Télécharger ce quiz</a>
-    <div class="score" id="score"></div>
+      <a href="data:text/html;charset=utf-8," download="quiz_pharmacologie.html" style="display:block;text-align:center;margin-top:20px;font-weight:bold;color:#4caf50;">⭳ Télécharger ce quiz</a>
+      <div class="score" id="score"></div>
     <div class="timer" id="timer"></div>
   </div>
 
   <script>
-    // Le tableau questions complet est trop long ici mais doit être collé dans cette variable
-    const question = [
+    const questions = [
       { question: "Un médicament administré par voie intraveineuse est :", answers: ["Absorbé lentement", "À effet immédiat", "Inutile", "Injecté par voie rectale"], correct: "À effet immédiat" },
       { question: "La forme galénique des suppositoires est destinée à quelle voie ?", answers: ["Orale", "Intramusculaire", "Rectale", "Sublinguale"], correct: "Rectale" },
       { question: "Les effets secondaires des médicaments doivent être :", answers: ["Ignorés", "Signalés", "Acceptés sans discussion", "Toujours présents"], correct: "Signalés" },
@@ -100,9 +99,17 @@
       { question: "Les pastilles se prennent :", answers: ["Par injection", "En les suçant", "Par le nez", "Avec une seringue"], correct: "En les suçant" },
       { question: "Le CBIP donne des infos sur :", answers: ["Les diagnostics", "Les traitements", "Les médicaments", "Les vaccins uniquement"], correct: "Les médicaments" }
     ];
-    let currentQuestion = 0, score = 0, timeLeft = 960, timerInterval;
-    const quizDiv = document.getElementById("quiz"), scoreDiv = document.getElementById("score"),
-          timerDiv = document.getElementById("timer"), startBtn = document.getElementById("startBtn");
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 960; // 10 minutes pour 40 questions
+    let timerInterval;
+
+    const quizDiv = document.getElementById("quiz");
+    const scoreDiv = document.getElementById("score");
+    const timerDiv = document.getElementById("timer");
+    const startBtn = document.getElementById("startBtn");
+
     startBtn.addEventListener("click", startQuiz);
 
     function startQuiz() {
@@ -111,15 +118,23 @@
       timerInterval = setInterval(() => {
         timeLeft--;
         timerDiv.textContent = `Temps restant : ${Math.floor(timeLeft / 60)}m ${timeLeft % 60}s`;
-        if (timeLeft <= 0) { clearInterval(timerInterval); endQuiz(); }
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endQuiz();
+        }
       }, 1000);
     }
 
     function showQuestion() {
-      if (currentQuestion >= questions.length) return endQuiz();
+      if (currentQuestion >= questions.length) {
+        endQuiz();
+        return;
+      }
+
       const q = questions[currentQuestion];
       quizDiv.innerHTML = `<div class="question">${q.question}</div>`;
-      const answersDiv = document.createElement("div"); answersDiv.classList.add("answers");
+      const answersDiv = document.createElement("div");
+      answersDiv.classList.add("answers");
       q.answers.forEach(answer => {
         const btn = document.createElement("button");
         btn.textContent = answer;
